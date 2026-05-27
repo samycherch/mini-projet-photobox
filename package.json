@@ -8,6 +8,7 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
-  "build": "esbuild src/lib/index.ts --bundle --sourcemap --target=es2015 --outfile=js/index.js"
+  "build": "esbuild src/lib/index.ts --bundle --sourcemap --target=es2015 --outfile=js/index.js",
+  "start": "npm run build && npx serve ."
   }
 }

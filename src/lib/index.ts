@@ -6,15 +6,26 @@ async function getCategoryForPhoto(photo: Photo): Promise<Category> {
     if (!photo.links.categorie) {
         throw new Error("Lien de catégorie absent pour cette photo.");
     }
-    return await loadResource<Category>(photo.links.categorie.href);
+
+    const data = await loadResource<{ categorie: Category }>(photo.links.categorie.href);
+    return data.categorie; // On extrait la bonne propriété
 }
 
 async function getCommentsForPhoto(photo: Photo): Promise<Comment[]> {
+    console.log("Links disponibles :", JSON.stringify(photo.links)); // ← voir tous les liens
+
+    if (!photo.links.commentaires) {
+        console.warn("Pas de lien commentaires dans photo.links"); // ← au lieu de return [] silencieux
+        return [];
+    }
     if (!photo.links.commentaires) {
         return [];
     }
-    const result = await loadResource<{ commentaires: Comment[] }>(photo.links.commentaires.href);
-    return result.commentaires;
+    const raw = await loadResource<unknown>(photo.links.commentaires.href);
+    console.log("Réponse brute commentaires :", JSON.stringify(raw)); // ← ici
+    
+    const result = raw as { commentaires: Comment[] };
+    return result.commentaires ?? [];
 }
 
 async function getPicture(id: number): Promise<void> {
@@ -26,7 +37,10 @@ async function getPicture(id: number): Promise<void> {
         displayPicture(photo);
 
         getCategoryForPhoto(photo)
-            .then(category => displayCategory(category))
+            .then(category => {
+                displayCategory(category);
+                console.log(`[Photo ${id}] Catégorie: ${category.nom}`);
+            })
             .catch(err => {
                 console.error("Erreur de catégorie :", err);
                 const categorySpan = document.querySelector('#la_categorie');
@@ -34,7 +48,10 @@ async function getPicture(id: number): Promise<void> {
             });
 
         getCommentsForPhoto(photo)
-            .then(comments => displayComments(comments))
+            .then(comments => {
+                displayComments(comments);
+                console.log(`[Photo ${id}] Commentaires: ${comments.length}`);
+            })
             .catch(err => console.error("Erreur de commentaires :", err));
 
     } catch (error) {

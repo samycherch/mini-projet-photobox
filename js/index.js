@@ -5799,8 +5799,10 @@
   function loadResource(uri) {
     return __async(this, null, function* () {
       const url = uri.startsWith("http") ? uri : `https://webetu.iutnc.univ-lorraine.fr${uri}`;
+      console.log("Chargement de la ressource \xE0 l'adresse :", url);
       try {
         const response = yield fetch(url, { credentials: "include" });
+        console.log("R\xE9ponse brute de la ressource :", response);
         if (!response.ok) {
           throw new Error(`Erreur HTTP ${response.status} : impossible de charger la ressource \xE0 l'adresse ${url}`);
         }
@@ -5862,16 +5864,25 @@
       if (!photo.links.categorie) {
         throw new Error("Lien de cat\xE9gorie absent pour cette photo.");
       }
-      return yield loadResource(photo.links.categorie.href);
+      const data = yield loadResource(photo.links.categorie.href);
+      return data.categorie;
     });
   }
   function getCommentsForPhoto(photo) {
     return __async(this, null, function* () {
+      var _a;
+      console.log("Links disponibles :", JSON.stringify(photo.links));
+      if (!photo.links.commentaires) {
+        console.warn("Pas de lien commentaires dans photo.links");
+        return [];
+      }
       if (!photo.links.commentaires) {
         return [];
       }
-      const result = yield loadResource(photo.links.commentaires.href);
-      return result.commentaires;
+      const raw = yield loadResource(photo.links.commentaires.href);
+      console.log("R\xE9ponse brute commentaires :", JSON.stringify(raw));
+      const result = raw;
+      return (_a = result.commentaires) != null ? _a : [];
     });
   }
   function getPicture(id) {
@@ -5881,12 +5892,18 @@
         console.log("R\xE9ponse brute :", JSON.stringify(photo));
         console.log(`[Photo ${id}] Titre: ${photo.titre}, Type: ${photo.type}, URL: ${photo.url}`);
         displayPicture(photo);
-        getCategoryForPhoto(photo).then((category) => displayCategory(category)).catch((err) => {
+        getCategoryForPhoto(photo).then((category) => {
+          displayCategory(category);
+          console.log(`[Photo ${id}] Cat\xE9gorie: ${category.nom}`);
+        }).catch((err) => {
           console.error("Erreur de cat\xE9gorie :", err);
           const categorySpan = document.querySelector("#la_categorie");
           if (categorySpan) categorySpan.textContent = "Inconnue";
         });
-        getCommentsForPhoto(photo).then((comments) => displayComments(comments)).catch((err) => console.error("Erreur de commentaires :", err));
+        getCommentsForPhoto(photo).then((comments) => {
+          displayComments(comments);
+          console.log(`[Photo ${id}] Commentaires: ${comments.length}`);
+        }).catch((err) => console.error("Erreur de commentaires :", err));
       } catch (error) {
         console.error(`Impossible de traiter la photo avec l'identifiant ${id}:`, error);
       }
