@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <title>index td8 : fetch</title>
@@ -7,29 +7,23 @@
 </head>
 <body>
 <main id="photo">
-<h1>Photo : 105</h1>
+  <h1>Photo</h1>
 
-<section id="la_photo">
-   <img src="">
-    <h4>titre</h4>
-      <p>description</p>
-	  <p>type, defX x defY</p>
-	  <h4 id="la_categorie">categorie : categorie de l'image</h4>
-	  <h4>commentaires : </h4>
-	  <ul id="les_commentaires">
-		  <li>pseudo : Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi, vitae.</li>
-		  <li>pseudo : Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi, recusandae.</li>
-	  </ul>
-
-</section>
+  <section id="la_photo">
+    <!-- rempli dynamiquement par Handlebars -->
+  </section>
 </main>
 
 <script id="photoTemplate" type="text/x-handlebars-template">
-
-  
+  <img src="{{src}}" alt="{{titre}}">
+  <h4>{{titre}}</h4>
+  <p>{{description}}</p>
+  <p>{{type}}, {{width}}x{{height}}</p>
+  <h4 id="la_categorie">categorie : </h4>
+  <h4>commentaires :</h4>
+  <ul id="les_commentaires"></ul>
 </script>
 
-<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-<script  src='js/index.js' defer ></script>
+<script src="js/index.js" defer></script>
 </body>
 </html>
