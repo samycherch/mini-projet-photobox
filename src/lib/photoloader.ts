@@ -1,38 +1,6 @@
 import { API_URL } from "./config";
+import type { Photo, Category, Comment } from './type.js';
 
-export interface Link {
-    href: string;
-}
-
-export interface Links {
-    categorie?: Link;
-    comments?: Link;
-}
-
-export interface Photo {
-    id: number;
-    titre: string;
-    file: string;
-    type: string;
-    url: Link;
-    descr: string;
-    width: number;
-    height: number;
-    links: Links;
-}
-
-export interface Category {
-    id: number;
-    nom: string;
-    descr: string;
-}
-
-export interface Comment {
-    id: number;
-    pseudo: string;
-    date: string;
-    content: string;
-}
 
 export async function loadPicture(idPicture: number): Promise<Photo> {
     const url = `${API_URL}/photos/${idPicture}`;
