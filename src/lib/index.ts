@@ -6,56 +6,36 @@ async function getCategoryForPhoto(photo: Photo): Promise<Category> {
     if (!photo.links.categorie) {
         throw new Error("Lien de catégorie absent pour cette photo.");
     }
-
     const data = await loadResource<{ categorie: Category }>(photo.links.categorie.href);
-    return data.categorie; // On extrait la bonne propriété
+    return data.categorie;
 }
 
 async function getCommentsForPhoto(photo: Photo): Promise<Comment[]> {
-    console.log("Links disponibles :", JSON.stringify(photo.links)); // ← voir tous les liens
-
-    if (!photo.links.commentaires) {
-        console.warn("Pas de lien commentaires dans photo.links"); // ← au lieu de return [] silencieux
+    if (!photo.links.comments) {
         return [];
     }
-    if (!photo.links.commentaires) {
-        return [];
-    }
-    const raw = await loadResource<unknown>(photo.links.commentaires.href);
-    console.log("Réponse brute commentaires :", JSON.stringify(raw)); // ← ici
-    
-    const result = raw as { commentaires: Comment[] };
-    return result.commentaires ?? [];
+    const raw = await loadResource<{ comments: Comment[] }>(photo.links.comments.href);
+    return raw.comments ?? [];
 }
 
 async function getPicture(id: number): Promise<void> {
     try {
         const photo = await loadPicture(id);
-                console.log("Réponse brute :", JSON.stringify(photo)); // ← ajoute cette ligne
-
-        console.log(`[Photo ${id}] Titre: ${photo.titre}, Type: ${photo.type}, URL: ${photo.url}`);
         displayPicture(photo);
 
         getCategoryForPhoto(photo)
-            .then(category => {
-                displayCategory(category);
-                console.log(`[Photo ${id}] Catégorie: ${category.nom}`);
-            })
-            .catch(err => {
-                console.error("Erreur de catégorie :", err);
-                const categorySpan = document.querySelector('#la_categorie');
-                if (categorySpan) categorySpan.textContent = "Inconnue";
+            .then(category => displayCategory(category))
+            .catch(() => {
+                const span = document.querySelector('#la_categorie');
+                if (span) span.textContent = "Inconnue";
             });
 
         getCommentsForPhoto(photo)
-            .then(comments => {
-                displayComments(comments);
-                console.log(`[Photo ${id}] Commentaires: ${comments.length}`);
-            })
-            .catch(err => console.error("Erreur de commentaires :", err));
+            .then(comments => displayComments(comments))
+            .catch(err => console.error("Erreur commentaires :", err));
 
     } catch (error) {
-        console.error(`Impossible de traiter la photo avec l'identifiant ${id}:`, error);
+        console.error(`Impossible de charger la photo ${id} :`, error);
     }
 }
 
@@ -72,5 +52,4 @@ function checkHashForPicture(): void {
 }
 
 checkHashForPicture();
-
 window.addEventListener('hashchange', checkHashForPicture);
