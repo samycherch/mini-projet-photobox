@@ -1,7 +1,7 @@
 import { loadPicture, loadResource } from './photoloader.js';
 import type { Photo, Category, Comment } from './photoloader.js';
 import { displayPicture, displayCategory, displayComments } from './ui.js';
-import { load } from './gallery.js';
+import { load, next, prev, first, last } from './gallery.js';
 import { display_galerie } from './gallery_ui.js';
 
 // ---- Exercice 1 ----
@@ -58,13 +58,21 @@ function checkHashForPicture(): void {
 checkHashForPicture();
 window.addEventListener('hashchange', checkHashForPicture);
 
-// ---- Exercice 2 ----
+// ---- Exercices 2 & 3 ----
 
-const btnLoad = document.querySelector('#btn_load');
-if (btnLoad) {
-    btnLoad.addEventListener('click', () => {
-        load()
-            .then(gallery => display_galerie(gallery))
-            .catch(err => console.error("Erreur chargement galerie :", err));
-    });
+function attachGalleryButton(id: string, action: () => Promise<any>): void {
+    const btn = document.querySelector(id);
+    if (btn) {
+        btn.addEventListener('click', () => {
+            action()
+                .then(gallery => display_galerie(gallery))
+                .catch(err => console.error("Erreur navigation galerie :", err));
+        });
+    }
 }
+
+attachGalleryButton('#btn_load',  load);
+attachGalleryButton('#btn_next',  next);
+attachGalleryButton('#btn_prev',  prev);
+attachGalleryButton('#btn_first', first);
+attachGalleryButton('#btn_last',  last);

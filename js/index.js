@@ -273,12 +273,12 @@
           if (options.data) {
             data = _utils.createFrame(options.data);
           }
-          function execIteration(field, index, last) {
+          function execIteration(field, index, last2) {
             if (data) {
               data.key = field;
               data.index = index;
               data.first = index === 0;
-              data.last = !!last;
+              data.last = !!last2;
               if (contextPath) {
                 data.contextPath = contextPath + field;
               }
@@ -1671,18 +1671,18 @@
               return (past.length > 20 ? "..." : "") + past.substr(-20).replace(/\n/g, "");
             },
             upcomingInput: function upcomingInput() {
-              var next = this.match;
-              if (next.length < 20) {
-                next += this._input.substr(0, 20 - next.length);
+              var next2 = this.match;
+              if (next2.length < 20) {
+                next2 += this._input.substr(0, 20 - next2.length);
               }
-              return (next.substr(0, 20) + (next.length > 20 ? "..." : "")).replace(/\n/g, "");
+              return (next2.substr(0, 20) + (next2.length > 20 ? "..." : "")).replace(/\n/g, "");
             },
             showPosition: function showPosition() {
               var pre = this.pastInput();
               var c = new Array(pre.length + 1).join("-");
               return pre + this.upcomingInput() + "\n" + c + "^";
             },
-            next: function next() {
+            next: function next2() {
               if (this.done) {
                 return this.EOF;
               }
@@ -2173,24 +2173,24 @@
         if (i === void 0) {
           i = body.length;
         }
-        var prev = body[i - 1], sibling = body[i - 2];
-        if (!prev) {
+        var prev2 = body[i - 1], sibling = body[i - 2];
+        if (!prev2) {
           return isRoot;
         }
-        if (prev.type === "ContentStatement") {
-          return (sibling || !isRoot ? /\r?\n\s*?$/ : /(^|\r?\n)\s*?$/).test(prev.original);
+        if (prev2.type === "ContentStatement") {
+          return (sibling || !isRoot ? /\r?\n\s*?$/ : /(^|\r?\n)\s*?$/).test(prev2.original);
         }
       }
       function isNextWhitespace(body, i, isRoot) {
         if (i === void 0) {
           i = -1;
         }
-        var next = body[i + 1], sibling = body[i + 2];
-        if (!next) {
+        var next2 = body[i + 1], sibling = body[i + 2];
+        if (!next2) {
           return isRoot;
         }
-        if (next.type === "ContentStatement") {
-          return (sibling || !isRoot ? /^\s*?\r?\n/ : /^\s*?(\r?\n|$)/).test(next.original);
+        if (next2.type === "ContentStatement") {
+          return (sibling || !isRoot ? /^\s*?\r?\n/ : /^\s*?(\r?\n|$)/).test(next2.original);
         }
       }
       function omitRight(body, i, multiple) {
@@ -3630,18 +3630,18 @@
         var previousName = 0;
         var previousSource = 0;
         var result = "";
-        var next;
+        var next2;
         var mapping;
         var nameIdx;
         var sourceIdx;
         var mappings = this._mappings.toArray();
         for (var i = 0, len = mappings.length; i < len; i++) {
           mapping = mappings[i];
-          next = "";
+          next2 = "";
           if (mapping.generatedLine !== previousGeneratedLine) {
             previousGeneratedColumn = 0;
             while (mapping.generatedLine !== previousGeneratedLine) {
-              next += ";";
+              next2 += ";";
               previousGeneratedLine++;
             }
           } else {
@@ -3649,26 +3649,26 @@
               if (!util.compareByGeneratedPositionsInflated(mapping, mappings[i - 1])) {
                 continue;
               }
-              next += ",";
+              next2 += ",";
             }
           }
-          next += base64VLQ.encode(mapping.generatedColumn - previousGeneratedColumn);
+          next2 += base64VLQ.encode(mapping.generatedColumn - previousGeneratedColumn);
           previousGeneratedColumn = mapping.generatedColumn;
           if (mapping.source != null) {
             sourceIdx = this._sources.indexOf(mapping.source);
-            next += base64VLQ.encode(sourceIdx - previousSource);
+            next2 += base64VLQ.encode(sourceIdx - previousSource);
             previousSource = sourceIdx;
-            next += base64VLQ.encode(mapping.originalLine - 1 - previousOriginalLine);
+            next2 += base64VLQ.encode(mapping.originalLine - 1 - previousOriginalLine);
             previousOriginalLine = mapping.originalLine - 1;
-            next += base64VLQ.encode(mapping.originalColumn - previousOriginalColumn);
+            next2 += base64VLQ.encode(mapping.originalColumn - previousOriginalColumn);
             previousOriginalColumn = mapping.originalColumn;
             if (mapping.name != null) {
               nameIdx = this._names.indexOf(mapping.name);
-              next += base64VLQ.encode(nameIdx - previousName);
+              next2 += base64VLQ.encode(nameIdx - previousName);
               previousName = nameIdx;
             }
           }
-          result += next;
+          result += next2;
         }
         return result;
       };
@@ -5856,6 +5856,65 @@
     });
   }
 
+  // src/lib/gallery.ts
+  var currentGallery = { photos: [], links: {} };
+  function loadGalleryFromUri(uri) {
+    return __async(this, null, function* () {
+      const data = yield loadResource(uri);
+      currentGallery = {
+        photos: data.photos.map((item) => item.photo),
+        links: data.links
+      };
+      return currentGallery;
+    });
+  }
+  function load() {
+    return __async(this, null, function* () {
+      return loadGalleryFromUri(`${API_URL}/photos`);
+    });
+  }
+  function next() {
+    return __async(this, null, function* () {
+      if (!currentGallery.links.next) throw new Error("Pas de page suivante.");
+      return loadGalleryFromUri(`https://webetu.iutnc.univ-lorraine.fr${currentGallery.links.next.href}`);
+    });
+  }
+  function prev() {
+    return __async(this, null, function* () {
+      if (!currentGallery.links.prev) throw new Error("Pas de page pr\xE9c\xE9dente.");
+      return loadGalleryFromUri(`https://webetu.iutnc.univ-lorraine.fr${currentGallery.links.prev.href}`);
+    });
+  }
+  function first() {
+    return __async(this, null, function* () {
+      if (!currentGallery.links.first) throw new Error("Pas de premi\xE8re page.");
+      return loadGalleryFromUri(`https://webetu.iutnc.univ-lorraine.fr${currentGallery.links.first.href}`);
+    });
+  }
+  function last() {
+    return __async(this, null, function* () {
+      if (!currentGallery.links.last) throw new Error("Pas de derni\xE8re page.");
+      return loadGalleryFromUri(`https://webetu.iutnc.univ-lorraine.fr${currentGallery.links.last.href}`);
+    });
+  }
+
+  // src/lib/gallery_ui.ts
+  function display_galerie(gallery) {
+    const container = document.querySelector("#la_galerie");
+    if (!container) {
+      console.error("\xC9l\xE9ment #la_galerie introuvable dans le HTML.");
+      return;
+    }
+    container.innerHTML = "";
+    gallery.photos.forEach((photo) => {
+      const img = document.createElement("img");
+      img.src = `https://webetu.iutnc.univ-lorraine.fr${photo.thumbnail.href}`;
+      img.alt = photo.titre;
+      img.dataset["photoId"] = String(photo.id);
+      container.appendChild(img);
+    });
+  }
+
   // src/lib/index.ts
   function getCategoryForPhoto(photo) {
     return __async(this, null, function* () {
@@ -5904,5 +5963,18 @@
   }
   checkHashForPicture();
   window.addEventListener("hashchange", checkHashForPicture);
+  function attachGalleryButton(id, action) {
+    const btn = document.querySelector(id);
+    if (btn) {
+      btn.addEventListener("click", () => {
+        action().then((gallery) => display_galerie(gallery)).catch((err) => console.error("Erreur navigation galerie :", err));
+      });
+    }
+  }
+  attachGalleryButton("#btn_load", load);
+  attachGalleryButton("#btn_next", next);
+  attachGalleryButton("#btn_prev", prev);
+  attachGalleryButton("#btn_first", first);
+  attachGalleryButton("#btn_last", last);
 })();
 //# sourceMappingURL=index.js.map

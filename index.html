@@ -6,23 +6,27 @@
   <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
+
 <main id="photo">
   <h1>Photo</h1>
-
   <section id="la_photo">
-    <!-- rempli dynamiquement par Handlebars -->
+    <!-- rempli dynamiquement -->
   </section>
 </main>
 
-<script id="photoTemplate" type="text/x-handlebars-template">
-  <img src="{{src}}" alt="{{titre}}">
-  <h4>{{titre}}</h4>
-  <p>{{description}}</p>
-  <p>{{type}}, {{width}}x{{height}}</p>
-  <h4 id="la_categorie">categorie : </h4>
-  <h4>commentaires :</h4>
-  <ul id="les_commentaires"></ul>
-</script>
+<main id="galerie">
+  <h1>Galerie</h1>
+  <nav>
+    <button id="btn_first">first</button>
+    <button id="btn_prev">prev</button>
+    <button id="btn_load">load</button>
+    <button id="btn_next">next</button>
+    <button id="btn_last">last</button>
+  </nav>
+  <section id="la_galerie">
+    <!-- rempli dynamiquement -->
+  </section>
+</main>
 
 <script src="js/index.js" defer></script>
 </body>
