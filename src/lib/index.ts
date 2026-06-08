@@ -1,6 +1,10 @@
 import { loadPicture, loadResource } from './photoloader.js';
 import type { Photo, Category, Comment } from './photoloader.js';
 import { displayPicture, displayCategory, displayComments } from './ui.js';
+import { load } from './gallery.js';
+import { display_galerie } from './gallery_ui.js';
+
+// ---- Exercice 1 ----
 
 async function getCategoryForPhoto(photo: Photo): Promise<Category> {
     if (!photo.links.categorie) {
@@ -53,3 +57,14 @@ function checkHashForPicture(): void {
 
 checkHashForPicture();
 window.addEventListener('hashchange', checkHashForPicture);
+
+// ---- Exercice 2 ----
+
+const btnLoad = document.querySelector('#btn_load');
+if (btnLoad) {
+    btnLoad.addEventListener('click', () => {
+        load()
+            .then(gallery => display_galerie(gallery))
+            .catch(err => console.error("Erreur chargement galerie :", err));
+    });
+}
