@@ -1,4 +1,5 @@
 import type { Gallery } from "./gallery.js";
+import { getPicture } from "./index.js";
 
 export function display_galerie(gallery: Gallery): void {
     const container = document.querySelector('#la_galerie');
@@ -14,6 +15,13 @@ export function display_galerie(gallery: Gallery): void {
         img.src = `https://webetu.iutnc.univ-lorraine.fr${photo.thumbnail.href}`;
         img.alt = photo.titre;
         img.dataset['photoId'] = String(photo.id);
+
+        img.addEventListener('click', () => {
+            const id = photo.id;
+            getPicture(id);
+            document.querySelector('#la_photo')?.scrollIntoView({ behavior: 'smooth' });
+        });
+
         container.appendChild(img);
     });
 }
