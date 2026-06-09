@@ -22,7 +22,7 @@ async function getCommentsForPhoto(photo: Photo): Promise<Comment[]> {
     return raw.comments ?? [];
 }
 
-async function getPicture(id: number): Promise<void> {
+export async function getPicture(id: number): Promise<void> {
     try {
         const photo = await loadPicture(id);
         displayPicture(photo);
