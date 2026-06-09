@@ -1,4 +1,55 @@
-img {
-    max-width: 30rem;
-    height: auto;
+#la_photo img {
+  max-width: 500px;
+  height: auto;
+  display: block;
+}
+
+.lightbox {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.lightbox.hidden {
+  display: none;
+}
+
+#lightbox_content img {
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
+}
+
+#lightbox_close {
+  position: fixed;
+  top: 1rem;
+  right: 1.5rem;
+  font-size: 2rem;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+#lightbox_prev,
+#lightbox_next {
+  font-size: 3rem;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0 1.5rem;
+  user-select: none;
+}
+
+#lightbox_prev:hover,
+#lightbox_next:hover,
+#lightbox_close:hover {
+  color: #ccc;
 }

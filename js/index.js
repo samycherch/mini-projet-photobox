@@ -2666,9 +2666,9 @@
         Decorator: function Decorator(decorator) {
           this.DecoratorBlock(decorator);
         },
-        ContentStatement: function ContentStatement(content) {
-          if (content.value) {
-            this.opcode("appendContent", content.value);
+        ContentStatement: function ContentStatement(content2) {
+          if (content2.value) {
+            this.opcode("appendContent", content2.value);
           }
         },
         CommentStatement: function CommentStatement() {
@@ -3489,9 +3489,9 @@
           if (!generator._sources.has(sourceRelative)) {
             generator._sources.add(sourceRelative);
           }
-          var content = aSourceMapConsumer.sourceContentFor(sourceFile);
-          if (content != null) {
-            generator.setSourceContent(sourceFile, content);
+          var content2 = aSourceMapConsumer.sourceContentFor(sourceFile);
+          if (content2 != null) {
+            generator.setSourceContent(sourceFile, content2);
           }
         });
         return generator;
@@ -3591,15 +3591,15 @@
         this._sources = newSources;
         this._names = newNames;
         aSourceMapConsumer.sources.forEach(function(sourceFile2) {
-          var content = aSourceMapConsumer.sourceContentFor(sourceFile2);
-          if (content != null) {
+          var content2 = aSourceMapConsumer.sourceContentFor(sourceFile2);
+          if (content2 != null) {
             if (aSourceMapPath != null) {
               sourceFile2 = util.join(aSourceMapPath, sourceFile2);
             }
             if (sourceRoot != null) {
               sourceFile2 = util.relative(sourceRoot, sourceFile2);
             }
-            this.setSourceContent(sourceFile2, content);
+            this.setSourceContent(sourceFile2, content2);
           }
         }, this);
       };
@@ -4331,9 +4331,9 @@
       IndexedSourceMapConsumer.prototype.sourceContentFor = function IndexedSourceMapConsumer_sourceContentFor(aSource, nullOnMissing) {
         for (var i = 0; i < this._sections.length; i++) {
           var section = this._sections[i];
-          var content = section.consumer.sourceContentFor(aSource, true);
-          if (content) {
-            return content;
+          var content2 = section.consumer.sourceContentFor(aSource, true);
+          if (content2) {
+            return content2;
           }
         }
         if (nullOnMissing) {
@@ -4468,12 +4468,12 @@
           node.add(remainingLines.splice(remainingLinesIndex).join(""));
         }
         aSourceMapConsumer.sources.forEach(function(sourceFile) {
-          var content = aSourceMapConsumer.sourceContentFor(sourceFile);
-          if (content != null) {
+          var content2 = aSourceMapConsumer.sourceContentFor(sourceFile);
+          if (content2 != null) {
             if (aRelativePath != null) {
               sourceFile = util.join(aRelativePath, sourceFile);
             }
-            node.setSourceContent(sourceFile, content);
+            node.setSourceContent(sourceFile, content2);
           }
         });
         return node;
@@ -5094,13 +5094,13 @@
         // On stack, after: ...
         //
         // Appends the string value of `content` to the current buffer
-        appendContent: function appendContent(content) {
+        appendContent: function appendContent(content2) {
           if (this.pendingContent) {
-            content = this.pendingContent + content;
+            content2 = this.pendingContent + content2;
           } else {
             this.pendingLocation = this.source.currentLocation;
           }
-          this.pendingContent = content;
+          this.pendingContent = content2;
         },
         // [append]
         //
@@ -5898,6 +5898,56 @@
     });
   }
 
+  // src/lib/lightbox.ts
+  var currentPhotos = [];
+  var currentIndex = 0;
+  var lightbox = document.querySelector("#lightbox");
+  var content = document.querySelector("#lightbox_content");
+  var btnClose = document.querySelector("#lightbox_close");
+  var btnPrev = document.querySelector("#lightbox_prev");
+  var btnNext = document.querySelector("#lightbox_next");
+  function showPhoto(index) {
+    return __async(this, null, function* () {
+      currentIndex = index;
+      const photo = currentPhotos[currentIndex];
+      const data = yield loadPicture(photo.id);
+      content.innerHTML = `
+        <figure>
+            <img src="https://webetu.iutnc.univ-lorraine.fr${data.url.href}" alt="${data.titre}">
+            <figcaption>
+                <strong>${data.titre}</strong><br>
+                ${data.descr}
+            </figcaption>
+        </figure>
+    `;
+    });
+  }
+  function openLightbox(photos, index) {
+    currentPhotos = photos;
+    lightbox.classList.remove("hidden");
+    showPhoto(index);
+  }
+  function closeLightbox() {
+    lightbox.classList.add("hidden");
+    content.innerHTML = "";
+  }
+  btnClose.addEventListener("click", closeLightbox);
+  btnPrev.addEventListener("click", () => {
+    if (currentIndex > 0) {
+      showPhoto(currentIndex - 1);
+    }
+  });
+  btnNext.addEventListener("click", () => {
+    if (currentIndex < currentPhotos.length - 1) {
+      showPhoto(currentIndex + 1);
+    }
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowLeft" && currentIndex > 0) showPhoto(currentIndex - 1);
+    if (e.key === "ArrowRight" && currentIndex < currentPhotos.length - 1) showPhoto(currentIndex + 1);
+  });
+
   // src/lib/gallery_ui.ts
   function display_galerie(gallery) {
     const container = document.querySelector("#la_galerie");
@@ -5906,11 +5956,14 @@
       return;
     }
     container.innerHTML = "";
-    gallery.photos.forEach((photo) => {
+    gallery.photos.forEach((photo, index) => {
       const img = document.createElement("img");
       img.src = `https://webetu.iutnc.univ-lorraine.fr${photo.thumbnail.href}`;
       img.alt = photo.titre;
       img.dataset["photoId"] = String(photo.id);
+      img.addEventListener("click", () => {
+        openLightbox(gallery.photos, index);
+      });
       container.appendChild(img);
     });
   }
